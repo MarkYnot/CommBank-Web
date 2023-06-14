@@ -11,10 +11,22 @@ import { selectGoalsMap, updateGoal as updateGoalRedux } from '../../../store/go
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import DatePicker from '../../components/DatePicker'
 import { Theme } from '../../components/Theme'
+import { BaseEmoji, Picker } from 'emoji-mart'
 
 type Props = { goal: Goal }
+
+const EmojiPickerContainer = styled.div<EmojiPickerContainerProps>`
+   display: ${(props) => (props.isOpen? 'flex':'none')};
+   position: absolute;
+   top: ${(props) => (props.hasIcon ? '10rem':'2rem')};
+   left:0;
+`
+
 export function GoalManager(props: Props) {
   const dispatch = useAppDispatch()
+  const [emojiPickerIsOpen, setEmojiPickerOpen] = useState(false);
+  const [icon, setIcon] = useState<string | null>(null)
+  const hasIcon = ()=> icon != null;
 
   const goal = useAppSelector(selectGoalsMap)[props.goal.id]
 
@@ -58,6 +70,21 @@ export function GoalManager(props: Props) {
       targetAmount: nextTargetAmount,
     }
     dispatch(updateGoalRedux(updatedGoal))
+    updateGoalApi(props.goal.id, updatedGoal)
+  }
+
+
+  const pickEmojiOnClick = () => (emoji: BaseEmoji, event: MouseEvent) => {
+    // ...
+
+    const updatedGoal: Goal = {
+      ...props.goal,
+      icon: emoji.native ?? props.goal.icon,
+      name: name ?? props.goal.name,
+      targetDate: targetDate ?? props.goal.targetDate,
+      targetAmount: targetAmount ?? props.goal.targetAmount,
+    }
+
     updateGoalApi(props.goal.id, updatedGoal)
   }
 
