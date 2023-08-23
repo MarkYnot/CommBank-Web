@@ -12,9 +12,11 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import DatePicker from '../../components/DatePicker'
 import { Theme } from '../../components/Theme'
 import { BaseEmoji, Picker } from 'emoji-mart'
+import EmojiPicker from '../../components/wrapper'
 
-type Props = { goal: Goal }
 
+
+type Props = {goal: Goal}
 const EmojiPickerContainer = styled.div<EmojiPickerContainerProps>`
    display: ${(props) => (props.isOpen? 'flex':'none')};
    position: absolute;
@@ -76,6 +78,10 @@ export function GoalManager(props: Props) {
 
   const pickEmojiOnClick = () => (emoji: BaseEmoji, event: MouseEvent) => {
     // ...
+    event.stopPropagation()
+
+    setIcon(emoji.native)
+    setEmojiPickerOpen(false)
 
     const updatedGoal: Goal = {
       ...props.goal,
@@ -85,7 +91,7 @@ export function GoalManager(props: Props) {
       targetAmount: targetAmount ?? props.goal.targetAmount,
     }
 
-    updateGoalApi(props.goal.id, updatedGoal)
+    dispatch(updateGoalRedux(updatedGoal))
   }
 
   const pickDateOnChange = (date: MaterialUiPickersDate) => {
@@ -126,6 +132,15 @@ export function GoalManager(props: Props) {
           <StringValue>{props.goal.balance}</StringValue>
         </Value>
       </Group>
+
+      <EmojiPickerContainer
+      isOpen={emojiPickerIsOpen}
+      hasIcon={hasIcon()}
+      onClick={(event) => event.stopPropagation()}
+    >
+      <EmojiPicker onClick={pickEmojiOnClick} />
+    </EmojiPickerContainer>
+  
 
       <Group>
         <Field name="Date Created" icon={faCalendarAlt} />
